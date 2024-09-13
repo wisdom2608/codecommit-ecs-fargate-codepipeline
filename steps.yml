@@ -1,0 +1,193 @@
+# KEY POINTS TO NOTE!
+# The purpose of This Project Is To Deploy A Containerized Application Automatically To AWS ECS Using CodeCommit.
+
+# --------------------------------------------
+# WHAT IS AWS Elastic Container Service (ECS) ?
+# --------------------------------------------
+
+# - Amazon Elastic Container Service (Amazon ECS) is a fully managed container orchestration service that helps you easily deploy,...
+# ...manage, and scale containerized applications.
+# - As a fully managed service, Amazon ECS comes with AWS configuration and operational best practices built-in. 
+# - It's integrated with both AWS and third-party tools, such as Amazon Elastic Container Registry and Docker. 
+# - This integration makes it easier for teams to focus on building the applications, not the environment. 
+
+# ---------------------
+# Amazon ECS capacity
+# ---------------------
+
+# Amazon ECS capacity is the infrastructure where your containers run. The following is an overview of the capacity options:
+
+# - Amazon EC2 instances in the AWS cloud: You choose the instance type, the number of instances, and manage the capacity.
+
+# - Serverless (AWS Fargate (Fargate)) in the AWS cloud: Fargate is a serverless, pay-as-you-go compute engine.
+#   With Fargate you don't need to manage servers, handle capacity planning, or isolate container workloads for security.
+
+# On-premises virtual machines (VM) or servers: Amazon ECS Anywhere provides support for registering an external instance ...
+# ... such as an on-premises server or virtual machine (VM), to your Amazon ECS cluster.
+
+# ----------------------
+# Application lifecycle
+# ----------------------
+
+# There are certain processes which you must follow (the application lifecycle ) to have your application deployed succesfully to AWS ECS
+
+
+# - You must architect your applications so that they can run on containers. 
+
+# ---------------------
+# What is a container ?
+# ----------------------
+
+# - A container is a standardized unit of software development that holds everything that your software application requires to run. 
+# This includes relevant code, runtime, system tools, and system libraries. 
+# Containers are created from a read-only template that's called an image. 
+# Images are typically built from a Dockerfile. 
+# A Dockerfile is a plaintext file that contains the instructions for building a container. 
+# After they're built, these images are stored in a registry such as Amazon ECR where they can be downloaded from.
+
+# After you create and store your image, you create an Amazon ECS task definition. 
+# A task definition is a blueprint for your application. 
+# It is a text file in JSON format that describes the parameters and one or more containers that form your application. 
+# For example, you can use it to specify the image and parameters for the operating system, which containers to use, ...
+# ...which ports to open for your application, and what data volumes to use with the containers in the task. 
+# The specific parameters available for your task definition depend on the needs of your specific application.
+
+# After you define your task definition, you deploy it as either a service or a task on your cluster. 
+# A cluster is a logical grouping of tasks or services that runs on the capacity infrastructure that is registered to a cluster.
+
+# A task is the instantiation of a task definition within a cluster. 
+# You can run a standalone task, or you can run a task as part of a service. 
+# You can use an Amazon ECS service to run and maintain your desired number of tasks simultaneously in an Amazon ECS cluster. 
+# How it works is that, if any of your tasks fail or stop for any reason, the Amazon ECS service scheduler launches another instance based on your task definition. 
+# It does this to replace it and thereby maintain your desired number of tasks in the service.
+
+# The container agent runs on each container instance within an Amazon ECS cluster. 
+# The agent sends information about the current running tasks and resource utilization of your containers to Amazon ECS. 
+# It starts and stops tasks whenever it receives a request from Amazon ECS.
+
+# After you deploy the task or service, you can use any of the following tools to monitor your deployment and application:
+
+# - CloudWatch
+# - Runtime Monitoring
+ 
+# --------------------------------------------
+#                   PROCEDURES
+# --------------------------------------------
+
+# Step 0: Test your Source Code locally untill it works.
+
+# Step 1: - Create An AWS account.
+#         - Create an ecr on aws.
+
+# After you create and store your image on ecr, you create an Amazon ECS cluster and task definition. 
+ 
+# Step 2: Create an ECS Cluster: A cluster is a logical grouping of tasks or services that runs on the capacity infrastructure that is registered to a cluster.
+#         To do this,
+#         * Search for Elastic Container Service, and on the left nagivigation menu, click on "Clusters"
+#         * click on "Create cluster"
+#         - under "Cluster configuration", give the custer a "name". The "Default namespace" is optional. You can copy the cluster name and paste there.
+#         - under "Infrastructure", select "AWS Fargate (serverless)".
+#         * Click on on "Create" to create the cluster
+
+
+# Step 3: Create an AWS ECS Task definition: A task definition is a blueprint for your application.
+#         To do this,
+#         * On the left nagivigation menu of ECS, click on "Task Definitions".
+#         * click on "Create new task definition".
+#         * For "Task definition configuration"
+#         * under "Task definition family", give the Task definition a name.
+#           - for "Launch Type" under "Infrastructure requirements", selet "AWS Fargate".
+#         * For "Container details" under "Container - 1",
+#           - under "name" put the name your container (NB: This container's name will be used for env under codepipeline).
+#           - under "URL", copy the URL of the repository you created on AWS ECR and paste in there.
+#         * Port mappings depend on the ports your application is listing on.
+#         * Leave all other things as Default and click on "create", to Create the Task definition.
+
+# Step 4 : Create Amazon ECS Service: Amazon ECS service is used to run and maintain your desired number of tasks simultaneously in an Amazon ECS cluster.   
+#       To do this,
+#       * click on the cluster created in step 2.
+#       * click on "create"
+#       * under "Environment", select "Existing cluster"
+#       * under  "configuration (advanced)": 
+#         - for "Compute options", select "Launch type".
+#         - for "Capacity provider strategy", select "Use custom (Advanced)".
+#         - for "Capacity provider", select "FARGATE"
+#         - for "Platform version" select "LATEST"
+#       * under "Deployment Configuration" :
+#         - for "Application type", select "Service"
+#       * Under "Task definition", leave other things as default.
+#         - for "Family", select the Task Definition you createted in step 3.
+#         - for "Revision" select "LATEST".
+#         - for "Service name", give the service a name
+#         - for "Service type", select "Replica"
+#         - for "Desired tasks", put 2
+#       * Leave everything as default
+#       * under "Networking"
+#         - for "VPC", select your vpc
+#         - for "subnet", choose your subnets
+#         - for "Security group" select an existing Security group or create a new security group which opens ports your alb balancer and your application.
+#         - for "Public IP", turgle it.
+#       * under "Load balancing - optional"
+#         - for "Load balancer type", select "Application Load Balancer"
+#         - for "Container" , it will appear by default
+#         - for "Application Load Balancer", choose "Create a new load balancer".
+#         - for "Load balancer name", give the Load Balancer a name.
+#         - for "Health check grace period", put 1
+#         - for "Listener", create the ports according to your application
+#         - for "Target group", create a tg or use an existing tg.
+#         * Leave other functionalities as default and click on "create", to create the service.
+#        
+# NB: It takes about 2 minutes create the Amazon ECS Seervice.
+
+# Step 5: Create a CodeCommit Repository and Colone it to your local or EC2 where your srce doce is.
+#          
+
+# Step 6: Create A CodeBuild Project
+#    To do this, search for CodeBuild service and on the left navigation menue, click on "build project"
+# - for "project nane" uder "Project configuration", give the project a name.
+# - for "Source provider", choose AWS CodeCommit.
+# - for "Repository", choose the repo you create in AWS ECR.
+# - for "Reference type", select "Branch"
+# - for "branch", select the "master" or a branch that will triger your code to run whenever changes are commited to it.
+# - leave everything as default.
+
+# - for "operating system", choose Linux. (I chose Linux the base image of my Dockerfile is Lunux). Choose Ubuntu if yours is ubuntu.
+# - for "Runtime(s)", choose standard.
+# - for image, select aws/codebuild/standard:4.0. 4.0 is the latest version. it changes over time.
+# - for "Build specifications", check "Use a buildspec file".\
+# - for "Logs", check "Cloudwatchlogs"
+# - for "Service role permissions", select the service role that you created on IAM.
+#   This service role contains permission to create containers on aws
+# - To create the policy of AmazonEC2containerRegistryFullAccess for codebuild, we create a role and attach this policy (AmazonEC2containerRegistryFullAccess) to it. To do this,
+         # (i) Go to IAM service dash board,
+         # (ii) Click on Policies,
+         # (iii) Search for *AmazonEC2containerRegistryFullAccess* on the search bar,
+         # (iv) Select the policy,
+         # (vi) Click on *action* and select *attach* to  grant the full access policy for codebuild,
+
+# Step 8: Create Code Pipeline
+
+# - under "Pipeline settings", give the pipeline a name
+# - under "Execution mode", check "Queued (Pipeline type V2 required)"
+# - under "Service role", choose "existing role" or choose "new role" to allow aws to create it automatically.
+# - leave everything as default, and click on "next"
+# - under "Source", choose "aws codecommit"
+# - give the repo name and the branch
+# - leave everything as default and click on next.
+# - for build stage, select "AWS Codebuild", choose your default region, select your projets's name.
+
+# Add Ev. variables
+
+# AWS_DEFAULT_REGION: The AWS region where your ECR and ECS are hosted (e.g., us-west-2).
+# AWS_ACCOUNT_ID: Your AWS account ID.
+# IMAGE_REPO_NAME: The name of your EcR repository.
+# REPOSITORY_URI: The URI of your ECR repository.
+# IMAGE_TAG: The tag you want to use for your Docker image (e.g., latest).
+# CONTAINER_NAME: The name of your container (you provided this name under task definition).
+# ECS_SERVICE_NAME: The name of your ECS service. 
+
+
+# - for "Add deploy stage", chose Amazon ECS, select your default region, cluster name, service name.
+# - leave everythig as defaulf and click "next"
+# - review the steps and hit on "next" to create the pipeline.
+# 
