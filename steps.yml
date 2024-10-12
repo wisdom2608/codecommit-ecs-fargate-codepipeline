@@ -96,9 +96,9 @@
 #         * click on "Create new task definition".
 #         * For "Task definition configuration"
 #         * under "Task definition family", give the Task definition a name.
-#           - for "Launch Type" under "Infrastructure requirements", selet "AWS Fargate".
+#           - for "Launch Type" under "Infrastructure requirements", select "AWS Fargate".
 #         * For "Container details" under "Container - 1",
-#           - under "name" put the name your container (NB: This container's name will be used for env under codepipeline).
+#           - under "name" put the name your container (NB: This container's name will be used for environment variables under codepipeline).
 #           - under "URL", copy the URL of the repository you created on AWS ECR and paste in there.
 #         * Port mappings depend on the ports your application is listing on.
 #         * Leave all other things as Default and click on "create", to Create the Task definition.
@@ -106,7 +106,7 @@
 # Step 4 : Create Amazon ECS Service: Amazon ECS service is used to run and maintain your desired number of tasks simultaneously in an Amazon ECS cluster.   
 #       To do this,
 #       * click on the cluster created in step 2.
-#       * click on "create"
+#       * click on "service" and click on create"
 #       * under "Environment", select "Existing cluster"
 #       * under  "configuration (advanced)": 
 #         - for "Compute options", select "Launch type".
@@ -131,6 +131,8 @@
 #         - for "Load balancer type", select "Application Load Balancer"
 #         - for "Container" , it will appear by default
 #         - for "Application Load Balancer", choose "Create a new load balancer".
+#            + create application load balancer security group (alb sg) and open http and https to the world.
+#            + create your web sg and point the inbound traffic only to the alb sg.
 #         - for "Load balancer name", give the Load Balancer a name.
 #         - for "Health check grace period", put 1
 #         - for "Listener", create the ports according to your application
@@ -139,8 +141,8 @@
 #        
 # NB: It takes about 2 minutes create the Amazon ECS Seervice.
 
-# Step 5: Create a CodeCommit Repository and Colone it to your local or EC2 where your srce doce is.
-#          
+# Step 5: Create a CodeCommit Repository and Colone it to your local or EC2 where your source code is.
+       
 
 # Step 6: Create A CodeBuild Project
 #    To do this, search for CodeBuild service and on the left navigation menue, click on "build project"
