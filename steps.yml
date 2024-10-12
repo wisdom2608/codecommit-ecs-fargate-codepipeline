@@ -42,7 +42,7 @@
 # This includes relevant code, runtime, system tools, and system libraries. 
 # Containers are created from a read-only template that's called an image. 
 # Images are typically built from a Dockerfile. 
-# A Dockerfile is a plaintext file that contains the instructions for building a container. 
+# A Dockerfile is a plaintext file that contains the instructions for building a Docker image. 
 # After they're built, these images are stored in a registry such as Amazon ECR where they can be downloaded from.
 
 # After you create and store your image, you create an Amazon ECS task definition. 
@@ -79,7 +79,7 @@
 # Step 1: - Create An AWS account.
 #         - Create an ecr on aws.
 
-# After you create and store your image on ecr, you create an Amazon ECS cluster and task definition. 
+# After you create and store your image on ecr, create an Amazon ECS cluster and task definition. 
  
 # Step 2: Create an ECS Cluster: A cluster is a logical grouping of tasks or services that runs on the capacity infrastructure that is registered to a cluster.
 #         To do this,
