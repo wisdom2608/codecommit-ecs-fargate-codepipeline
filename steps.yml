@@ -1,5 +1,5 @@
 # KEY POINTS TO NOTE!
-# The purpose of This Project Is To Deploy A Containerized Application Automatically To AWS ECS Using CodeCommit.
+# The purpose of This Project Is To Deploy A Containerized Application Automatically To AWS ECS Fargate Using CodeCommit.
 
 # --------------------------------------------
 # WHAT IS AWS Elastic Container Service (ECS) ?
